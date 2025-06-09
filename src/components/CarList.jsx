@@ -37,9 +37,9 @@ const CarList = ({ user }) => {
       {/* SLIDER */}
       {cars.length > 0 && (
         <div className="relative w-full h-64 bg-gray-100 rounded-lg shadow mb-10 overflow-hidden">
-          {cars[currentSlide].imageUrl && (
+          {cars[currentSlide].image_url && (
             <img
-              src={`http://localhost/carshop/backend/${cars[currentSlide].imageUrl}`}
+              src={`http://localhost/car/backend/${cars[currentSlide].image_url}`}
               alt={`${cars[currentSlide].brand} ${cars[currentSlide].model}`}
               className="w-full h-full object-cover absolute top-0 left-0 opacity-40"
             />
@@ -62,9 +62,9 @@ const CarList = ({ user }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {cars.map((car) => (
           <div key={car.id} className="bg-white p-4 rounded shadow flex flex-col">
-            {car.imageUrl && (
+            {car.image_url && (
               <img
-                src={`http://localhost/carshop/backend/${car.imageUrl}`}
+                src={`http://localhost/car/backend/${car.image_url}`}
                 alt={`${car.brand} ${car.model}`}
                 className="w-full h-40 object-cover rounded mb-3"
               />

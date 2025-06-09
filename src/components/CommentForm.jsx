@@ -9,7 +9,7 @@ const CommentForm = ({ userId, carId, onCommentAdded }) => {
     console.log('Data being sent to the server:', newComment);
 
     try {
-      const response = await fetch('http://localhost/carshop/backend/api/comments/create_comment.php', {
+      const response = await fetch('http://localhost/car/backend/api/comments/create_comment.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

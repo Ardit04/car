@@ -1,60 +1,78 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
+// Include DB connection
 require_once '../../db/db.php';
-require_once '../../models/Car.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['error' => 'Invalid request method']);
+    http_response_code(405);
+    echo json_encode(['error' => 'Only POST allowed']);
     exit;
 }
 
-if (!isset($_POST['brand'], $_POST['model'], $_POST['year'], $_POST['price'])) {
-    echo json_encode(['error' => 'Missing required fields']);
-    exit;
-}
-
-$imageUrl = null;
-if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = '../../uploads/';
-    if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
-    }
-
-    $filename = time() . '_' . basename($_FILES['image']['name']); // emër unik
-    $targetFilePath = $uploadDir . $filename;
-
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFilePath)) {
-        $imageUrl = 'uploads/' . $filename;
-    } else {
-        echo json_encode(['error' => 'Failed to move uploaded file']);
+// Validate fields
+$required = ['brand', 'model', 'year', 'price', 'description'];
+foreach ($required as $field) {
+    if (empty($_POST[$field])) {
+        http_response_code(400);
+        echo json_encode(['error' => "Missing field: $field"]);
         exit;
     }
 }
 
-$data = [
-    'brand' => $_POST['brand'],
-    'model' => $_POST['model'],
-    'year' => $_POST['year'],
-    'price' => $_POST['price'],
-    'description' => $_POST['description'] ?? null,
-    'imageUrl' => $imageUrl
-];
-
-$car = new Car($pdo);
-$result = $car->create($data);
-
-if ($result !== true) {
-    echo json_encode([
-        'success' => false,
-        'error' => $result
-    ]);
+// Handle image upload
+if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Image upload failed']);
     exit;
 }
 
-echo json_encode([
-    'success' => true,
-    'message' => 'Car created successfully'
-]);
+$uploadDir = '../../uploads/';
+if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0755, true);
+}
+
+$imageTmpPath = $_FILES['image']['tmp_name'];
+$imageName = basename($_FILES['image']['name']);
+$uploadPath = $uploadDir . $imageName;
+
+if (!move_uploaded_file($imageTmpPath, $uploadPath)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Failed to move uploaded file']);
+    exit;
+}
+
+// Insert into database
+try {
+    $stmt = $pdo->prepare("INSERT INTO cars (brand, model, year, price, description, image_url) 
+                           VALUES (:brand, :model, :year, :price, :description, :image_url)");
+    $stmt->execute([
+        ':brand' => $_POST['brand'],
+        ':model' => $_POST['model'],
+        ':year' => $_POST['year'],
+        ':price' => $_POST['price'],
+        ':description' => $_POST['description'],
+        ':image_url' => $imageName
+    ]);
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Car created and saved to database',
+        'car' => [
+            'brand' => $_POST['brand'],
+            'model' => $_POST['model'],
+            'year' => $_POST['year'],
+            'price' => $_POST['price'],
+            'description' => $_POST['description'],
+            'image_url' => $imageName
+        ]
+    ]);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'DB insert failed: ' . $e->getMessage()]);
+    exit;
+}

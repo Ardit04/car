@@ -38,39 +38,42 @@ const CarForm = ({ carToEdit, onSuccess }) => {
     setForm({ ...form, image: e.target.files[0] });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (form.id) {
-      await updateCar(form.id, {
-        brand: form.brand,
-        model: form.model,
-        year: form.year,
-        price: form.price,
-        description: form.description,
-        imageUrl: null
-      });
-    } else {
-      const formData = new FormData();
-      formData.append('brand', form.brand);
-      formData.append('model', form.model);
-      formData.append('year', form.year);
-      formData.append('price', form.price);
-      formData.append('description', form.description);
-      if (form.image) {
-        formData.append('image', form.image);
-      }
-      for (let pair of formData.entries()) {
-  console.log(pair[0]+ ': ' + pair[1]);
-}
-
-
-      await createCar(formData);
+  if (form.id) {
+    // UPDATE
+    await updateCar(form.id, {
+      brand: form.brand,
+      model: form.model,
+      year: form.year,
+      price: form.price,
+      description: form.description,
+      imageUrl: null // Optional: handle update with/without image
+    });
+  } else {
+    // CREATE
+    const formData = new FormData();
+    formData.append('brand', form.brand);
+    formData.append('model', form.model);
+    formData.append('year', form.year);
+    formData.append('price', form.price);
+    formData.append('description', form.description);
+    if (form.image) {
+      formData.append('image', form.image);
     }
 
-    setForm(initialForm);
-    if (onSuccess) onSuccess();
-  };
+    try {
+      await createCar(formData);
+    } catch (error) {
+      alert("Failed to create car: " + error.message);
+    }
+  }
+
+  setForm(initialForm);
+  if (onSuccess) onSuccess();
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white shadow rounded">

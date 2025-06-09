@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost/carshop/backend/api/comments';
+const BASE_URL = 'http://localhost/car/backend/api/comments';
 
 export const getComments = async (userId) => {
   const response = await fetch(`${BASE_URL}/index_comment.php?user_id=${userId}`);

@@ -13,7 +13,7 @@ export default function LoginForm({ onLogin }) {
     e.preventDefault();
     setMessage("");
     try {
-      const res = await fetch("http://localhost/carshop/backend/api/auth/login.php", {
+      const res = await fetch("http://localhost/car/backend/api/auth/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

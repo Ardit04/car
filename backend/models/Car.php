@@ -30,7 +30,7 @@ class Car {
         $data['year'],
         $data['price'],
         $data['description'] ?? null,
-        $data['imageUrl'] ?? null
+        $data['image_url'] ?? null
     ]);
 
     if (!$result) {
@@ -50,7 +50,7 @@ class Car {
             $data['year'],
             $data['price'],
             $data['description'] ?? null,
-            $data['imageUrl'] ?? null,
+            $data['image_url'] ?? null,
             $id
         ]);
 

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost/carshop/backend/api/cars';
+const BASE_URL = 'http://localhost/car/backend/api/cars';
 
 export const getCars = async () => {
   const data = await fetch(`${BASE_URL}/index.php`);

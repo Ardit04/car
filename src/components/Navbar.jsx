@@ -23,7 +23,7 @@ const Navbar = ({ user, onLogout }) => {
     <nav className="bg-black text-white p-4 relative z-50">
       <div className="flex justify-between items-center">
         <Link to="/" className="text-xl font-bold no-underline">
-          CarShop
+          car
         </Link>
 
         <button
