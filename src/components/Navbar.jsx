@@ -75,7 +75,7 @@ const Navbar = ({ user, onLogout }) => {
               <li><Link to="/about" className="hover:underline">About Us</Link></li>
               <li><Link to="/contact" className="hover:underline">Contact Us</Link></li>
               <li><Link to="/car" className="hover:underline">Cars</Link></li>
-              <li><Link to="/cart" className="hover:underline">Order</Link></li>
+              <li><Link to="/cart" className="hover:underline">Save</Link></li>
               <li><button onClick={handleLogout} className="hover:underline">Logout</button></li>
             </>
           )}

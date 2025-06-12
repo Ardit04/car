@@ -3,9 +3,26 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-require_once 'Contact.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-$data = json_decode(file_get_contents('php://input'), true);
+require_once '../../db/db.php'; // this defines $pdo
+require_once '../../models/Contact.php';
+
+
+$rawData = file_get_contents("php://input");
+file_put_contents("debug.txt", $rawData); // krijo file për të parë inputin
+
+$data = json_decode($rawData, true);
+if (!$data) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Invalid JSON or missing Content-Type header",
+        "raw" => $rawData
+    ]);
+    exit;
+}
 
 $name = $data['name'] ?? '';
 $email = $data['email'] ?? '';
@@ -13,7 +30,7 @@ $message = $data['message'] ?? '';
 
 if ($name && $email && $message) {
     try {
-        $contact = new Contact('localhost', 'root', '', 'car_shop_db');
+        $contact = new Contact($pdo); // pass the PDO object
         $contact->save($name, $email, $message);
         echo json_encode(['success' => true, 'message' => 'Message saved!']);
     } catch (Exception $e) {
@@ -24,4 +41,4 @@ if ($name && $email && $message) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Missing fields']);
 }
-?>
+var_dump($data);

@@ -1,23 +1,30 @@
 <?php
+// NO session_start() here
+// NO require_once here
+
 class Cart {
-    private $items = [];
+    public function __construct() {
+        if (!isset($_SESSION['cart_items'])) {
+            $_SESSION['cart_items'] = [];
+        }
+    }
 
     public function addItem($item) {
-        $this->items[] = $item;
+        $_SESSION['cart_items'][] = $item;
         return ['message' => 'Item added to cart'];
     }
 
     public function removeItem($id) {
-        $this->items = array_filter($this->items, fn($item) => $item['id'] !== $id);
+        $_SESSION['cart_items'] = array_filter($_SESSION['cart_items'], fn($item) => $item['id'] !== $id);
         return ['message' => 'Item removed from cart'];
     }
 
     public function viewCart() {
-        return $this->items;
+        return $_SESSION['cart_items'];
     }
 
     public function clearCart() {
-        $this->items = [];
+        $_SESSION['cart_items'] = [];
         return ['message' => 'Cart cleared'];
     }
 }
