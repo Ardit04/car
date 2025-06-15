@@ -9,16 +9,21 @@ class Contact {
         $this->pdo = $pdo;
     }
 
-    public function save($name, $email, $message) {
-        $sql = "INSERT INTO contacts (name, email, message) VALUES (:name, :email, :message)";
-        $stmt = $this->pdo->prepare($sql);
+   public function save($name, $email, $message) {
+    $sql = "INSERT INTO contacts (name, email, message) VALUES (:name, :email, :message)";
+    $stmt = $this->pdo->prepare($sql);
 
-        if (!$stmt->execute([
-            ':name' => $name,
-            ':email' => $email,
-            ':message' => $message
-        ])) {
-            throw new Exception("Failed to insert message.");
-        }
+    if (!$stmt) {
+        throw new Exception("SQL prepare failed: " . implode(", ", $this->pdo->errorInfo()));
     }
+
+    if (!$stmt->execute([
+        ':name' => $name,
+        ':email' => $email,
+        ':message' => $message
+    ])) {
+        throw new Exception("SQL execute failed: " . implode(", ", $stmt->errorInfo()));
+    }
+}
+
 }

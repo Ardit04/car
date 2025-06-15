@@ -1,33 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { getComments } from '../api/commentService'; // Correct import
+import { getComments } from '../api/commentService';
 
 const CommentList = ({ userId, newComment }) => {
   const [comments, setComments] = useState([]);
-console.log('CommentList component rendered', userId); // Debugging line
+
+  console.log('CommentList component rendered, userId:', userId);
+
   useEffect(() => {
     if (userId) {
       const fetchComments = async () => {
         try {
-          const data = await getComments(7); // Fetch comments for the user ARDIT
-          
-          console.log('Fetched comments:', data); // Debug the response
-          setComments(data.comments || []); // Ensure comments is always an array
+          const data = await getComments(userId); // përdor userId nga props
+          console.log('Fetched comments:', data);
+          if (!data.success) {
+            console.error('API returned failure:', data.message);
+          }
+          setComments(data.comments || []);
         } catch (error) {
-          setComments([]); // Default to an empty array on error
+          console.error('Error fetching comments:', error);
+          setComments([]);
         }
       };
+
       fetchComments();
     } else {
       console.log('User ID is missing');
     }
   }, [userId]);
 
-  // Add new comment to the list when it changes
-  useEffect(() => {
-    if (newComment) {
-      setComments((prevComments) => [newComment, ...prevComments]);
-    }
-  }, [newComment]);
+useEffect(() => {
+  console.log("newComment prop changed:", newComment);
+  if (newComment) {
+    setComments((prevComments) => [newComment, ...prevComments]);
+  }
+}, [newComment]);
 
   return (
     <div>
@@ -35,7 +41,7 @@ console.log('CommentList component rendered', userId); // Debugging line
       {comments.length > 0 ? (
         comments.map((comment) => (
           <div key={comment.id}>
-            <p>{comment.text}</p>
+            <p>{comment.comment}</p> {/* përdor comment.comment nga backend */}
           </div>
         ))
       ) : (

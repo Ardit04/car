@@ -1,13 +1,14 @@
 const BASE_URL = 'http://localhost/car/backend/api/comments';
 
 export const getComments = async (userId) => {
-  const response = await fetch(`${BASE_URL}/index_comment.php?user_id=${userId}`);
+  const response = await fetch(`http://localhost/car/backend/api/comments/index_comment.php?user_id=${userId}`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch comments');
   }
   return response.json();
 };
+
 
 export const createComment = async (comment) => {
   const res = await fetch(`${BASE_URL}/create_comment.php`, {

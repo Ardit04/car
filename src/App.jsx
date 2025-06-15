@@ -51,7 +51,7 @@ function App() {
               user && user.role === 0 ? (
                 <>
                   <CarManager />
-                  <CommentList />
+<CommentList userId={user?.id} />
                 </>
               ) : (
                 <Navigate to="/login" />

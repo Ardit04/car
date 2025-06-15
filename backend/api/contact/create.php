@@ -10,9 +10,8 @@ error_reporting(E_ALL);
 require_once '../../db/db.php'; // this defines $pdo
 require_once '../../models/Contact.php';
 
-
 $rawData = file_get_contents("php://input");
-file_put_contents("debug.txt", $rawData); // krijo file për të parë inputin
+// file_put_contents("debug.txt", $rawData); // ← Remove this in production
 
 $data = json_decode($rawData, true);
 if (!$data) {
@@ -30,7 +29,7 @@ $message = $data['message'] ?? '';
 
 if ($name && $email && $message) {
     try {
-        $contact = new Contact($pdo); // pass the PDO object
+        $contact = new Contact($pdo);
         $contact->save($name, $email, $message);
         echo json_encode(['success' => true, 'message' => 'Message saved!']);
     } catch (Exception $e) {
@@ -41,4 +40,5 @@ if ($name && $email && $message) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Missing fields']);
 }
-var_dump($data);
+
+// var_dump($data); // ← Remove this, it breaks the JSON
