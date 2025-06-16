@@ -21,7 +21,7 @@ const CarList = ({ user }) => {
 
     const interval = setInterval(() => {
       setCurrentSlide((prevIndex) => (prevIndex + 1) % cars.length);
-    }, 2000);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [cars]);
@@ -30,77 +30,124 @@ const CarList = ({ user }) => {
     console.log(`New comment added for car ${carId}:`, comment);
   };
 
+  // Show admin table view
+  if (user && user.role === 0) {
+    return (
+      <div className="p-6">
+        <h2 className="text-3xl text-center font-bold mb-6">Admin Car List</h2>
+        <table className="min-w-full border border-gray-300">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="border px-4 py-2">Photo</th>
+              <th className="border px-4 py-2">Brand</th>
+              <th className="border px-4 py-2">Model</th>
+              <th className="border px-4 py-2">Year</th>
+              <th className="border px-4 py-2">Price</th>
+              <th className="border px-4 py-2">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cars.map((car) => (
+              <tr key={car.id} className="text-center">
+                <td className="border px-4 py-2">
+                  {car.image_url ? (
+                    <img
+                      src={`http://localhost/car/backend/uploads/${car.image_url}`}
+                      alt={`${car.brand} ${car.model}`}
+                      className="w-24 h-16 object-contain mx-auto"
+                      loading="lazy"
+                    />
+                  ) : (
+                    'No Image'
+                  )}
+                </td>
+                <td className="border px-4 py-2">{car.brand}</td>
+                <td className="border px-4 py-2">{car.model}</td>
+                <td className="border px-4 py-2">{car.year}</td>
+                <td className="border px-4 py-2">${car.price}</td>
+                <td className="border px-4 py-2 truncate max-w-xs">{car.description || 'N/A'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  // Otherwise, show regular user view with slider + grid cards
   return (
     <div className="p-6">
-      <h2 className="text-3xl text-center font-bold mb-6">Car List</h2>
+      <h2 className="text-3xl text-center font-bold mb-6">The car of your dreams</h2>
 
-      {/* SLIDER */}
+      {/* Slider */}
       {cars.length > 0 && (
-        <div className="relative w-full h-64 bg-gray-100 rounded-lg shadow mb-10 overflow-hidden">
+        <div className="w-full mb-10 flex flex-col items-center">
           {cars[currentSlide].image_url && (
             <img
-            src={`http://localhost/car/backend/uploads/${cars[currentSlide].image_url}`}
-            alt={`${cars[currentSlide].brand} ${cars[currentSlide].model}`}
-            className="w-full h-full object-cover absolute top-0 left-0 opacity-40"
-          />
-
+              src={`http://localhost/car/backend/uploads/${cars[currentSlide].image_url}`}
+              alt={`${cars[currentSlide].brand} ${cars[currentSlide].model}`}
+              className="w-full max-h-[400px] object-contain rounded"
+              loading="lazy"
+            />
           )}
-          <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-black">
-            <h3 className="text-2xl font-semibold">
+          <div className="mt-4 text-center">
+            <h3 className="text-2xl md:text-3xl font-semibold">
               {cars[currentSlide].brand} {cars[currentSlide].model}
             </h3>
             <p className="text-gray-700 font-medium">
               {cars[currentSlide].year} - ${cars[currentSlide].price}
             </p>
-            {cars[currentSlide].description && (
-              <p className="text-sm mt-2 max-w-md px-2">{cars[currentSlide].description}</p>
-            )}
           </div>
         </div>
       )}
 
-      {/* CAR GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {/* Car grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {cars.map((car) => (
-          <div key={car.id} className="bg-white p-4 rounded shadow flex flex-col">
+          <div
+            key={car.id}
+            className="bg-white p-4 rounded shadow-md hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col items-center"
+          >
             {car.image_url && (
-              <img
-              src={`http://localhost/car/backend/uploads/${car.image_url}`}
-              alt={`${car.brand} ${car.model}`}
-              className="w-full h-40 object-cover rounded mb-3"
-            />
-
-            )}
-            <div className="flex justify-between items-center mb-1">
-            <h4 className="text-lg font-bold">
-              {car.brand} {car.model}
-            </h4>
-
-            {user?.role === 1 && (
-              <AddToCartButton
-                item={{ id: car.id, name: `${car.brand} ${car.model}`, price: car.price }}
-              />
-            )}
-          </div>
-
-          <p className="text-gray-600">{car.year} - ${car.price}</p>
-
-          {car.description && (
-            <p className="text-gray-500 text-sm mt-1">{car.description}</p>
-          )}
-
-
-           
-            {/* Comment Form */}
-            {user?.role === 1 && (
-              <div className="mt-2">
-                <CommentForm
-                  userId={user.id}
-                  carId={car.id}
-                  onCommentAdded={(comment) => handleCommentAdded(car.id, comment)}
+              <div className="w-full aspect-video bg-gray-50 flex items-center justify-center overflow-hidden rounded mb-3">
+                <img
+                  src={`http://localhost/car/backend/uploads/${car.image_url}`}
+                  alt={`${car.brand} ${car.model}`}
+                  className="max-h-full max-w-full object-contain"
+                  loading="lazy"
                 />
               </div>
             )}
+
+            <div className="w-full">
+              <div className="flex justify-between items-center mb-1">
+                <h4 className="text-lg font-bold">
+                  {car.brand} {car.model}
+                </h4>
+
+                {user?.role === 1 && (
+                  <AddToCartButton
+                    item={{ id: car.id, name: `${car.brand} ${car.model}`, price: car.price }}
+                  />
+                )}
+              </div>
+
+              <p className="text-gray-600">{car.year} - ${car.price}</p>
+
+              {car.description && (
+                <p className="text-gray-500 text-sm mt-1 line-clamp-3">{car.description}</p>
+              )}
+
+              {user?.role === 1 && (
+                <div className="mt-2">
+                  <CommentForm
+                    userId={user.id}
+                    carId={car.id}
+                    onCommentAdded={(comment) => handleCommentAdded(car.id, comment)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

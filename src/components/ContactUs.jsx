@@ -14,15 +14,21 @@ const ContactUs = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await sendContactMessage(formData);
-      alert(data.message);
-    } catch (err) {
-      alert('Failed to send message.');
-    }
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const data = await sendContactMessage(formData);
+    alert(data.message);
+    setFormData({
+      name: "",
+      email: "",
+      message: "",
+    });
+  } catch (err) {
+    alert('Failed to send message.');
+  }
+};
+
 
   return (
     <div

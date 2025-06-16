@@ -51,7 +51,7 @@ class Car {
             $data['price'],
             $data['description'] ?? null,
             $data['image_url'] ?? null,
-            $id
+            
         ]);
 
         if (!$result) {

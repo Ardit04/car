@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../App.css';
 
-const Navbar = ({ user, onLogout }) => {
+const Navbar = ({ user, onLogout, vertical }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -19,6 +18,45 @@ const Navbar = ({ user, onLogout }) => {
     setMenuOpen(false);
   };
 
+  if (vertical) {
+    // Admin vertical sidebar
+    return (
+      <nav className="p-6 h-full flex flex-col justify-between">
+        <div>
+          <h2 className="text-xl font-bold mb-6">Admin Dashboard</h2>
+          {user && (
+            <div className="mb-4 text-sm text-gray-300">
+              Logged in as: <span className="font-semibold">{user.username || user.email}</span>
+            </div>
+          )}
+          <ul className="space-y-4">
+            <li>
+              <Link to="/admin/add-car" className="hover:underline block" onClick={closeMenu}>
+                Add Car
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/comments" className="hover:underline block" onClick={closeMenu}>
+                Comment List
+              </Link>
+            </li>
+            <li>
+              <Link to="/admin/cars" className="hover:underline block" onClick={closeMenu}>
+                Car List
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <button onClick={handleLogout} className="text-red-400 hover:underline mt-8">
+            Logout
+          </button>
+        </div>
+      </nav>
+    );
+  }
+
+  // Regular horizontal navbar for users
   return (
     <nav className="bg-black text-white p-4 relative z-50">
       <div className="flex justify-between items-center">
@@ -66,7 +104,6 @@ const Navbar = ({ user, onLogout }) => {
               <li><Link to="/contact" className="hover:underline">Contact Us</Link></li>
               <li><Link to="/car" className="hover:underline">Cars</Link></li>
               <li><Link to="/login" className="hover:underline">Login</Link></li>
-
             </>
           )}
 
@@ -82,7 +119,9 @@ const Navbar = ({ user, onLogout }) => {
 
           {user && user.role === 0 && (
             <>
-              <li><Link to="/admin" className="hover:underline">Admin</Link></li>
+              <li><Link to="/admin/add-car" className="hover:underline">Add Car</Link></li>
+              <li><Link to="/admin/comments" className="hover:underline">Comments</Link></li>
+              <li><Link to="/admin/cars" className="hover:underline">Car List</Link></li>
               <li><button onClick={handleLogout} className="hover:underline">Logout</button></li>
             </>
           )}
@@ -124,7 +163,6 @@ const Navbar = ({ user, onLogout }) => {
                   Login
                 </Link>
               </li>
-              
             </>
           )}
 
@@ -167,8 +205,18 @@ const Navbar = ({ user, onLogout }) => {
           {user && user.role === 0 && (
             <>
               <li>
-                <Link to="/admin" onClick={closeMenu} className="block hover:underline">
-                  Admin
+                <Link to="/admin/add-car" onClick={closeMenu} className="block hover:underline">
+                  Add Car
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/comments" onClick={closeMenu} className="block hover:underline">
+                  Comments
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/cars" onClick={closeMenu} className="block hover:underline">
+                  Car List
                 </Link>
               </li>
               <li>
