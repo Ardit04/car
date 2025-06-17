@@ -4,36 +4,32 @@ import { getComments } from '../api/commentService';
 const CommentList = ({ userId, newComment }) => {
   const [comments, setComments] = useState([]);
 
-  console.log('CommentList component rendered, userId:', userId);
+  const fetchComments = async () => {
+    if (!userId) return;
+    try {
+      const data = await getComments(userId);
+      console.log('Fetched comments:', data);
+      if (data.success) {
+        setComments(data.comments || []);
+      } else {
+        console.error('API returned failure:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      setComments([]);
+    }
+  };
 
   useEffect(() => {
-    if (userId) {
-      const fetchComments = async () => {
-        try {
-          const data = await getComments(userId); // përdor userId nga props
-          console.log('Fetched comments:', data);
-          if (!data.success) {
-            console.error('API returned failure:', data.message);
-          }
-          setComments(data.comments || []);
-        } catch (error) {
-          console.error('Error fetching comments:', error);
-          setComments([]);
-        }
-      };
-
-      fetchComments();
-    } else {
-      console.log('User ID is missing');
-    }
+    fetchComments();
   }, [userId]);
 
-useEffect(() => {
-  console.log("newComment prop changed:", newComment);
-  if (newComment) {
-    setComments((prevComments) => [newComment, ...prevComments]);
-  }
-}, [newComment]);
+  useEffect(() => {
+    if (newComment) {
+      console.log("New comment detected, refreshing comments from backend...");
+      fetchComments();
+    }
+  }, [newComment]);
 
   return (
     <div>
@@ -41,7 +37,7 @@ useEffect(() => {
       {comments.length > 0 ? (
         comments.map((comment) => (
           <div key={comment.id}>
-            <p>{comment.comment}</p> {/* përdor comment.comment nga backend */}
+            <p>{comment.comment}</p>
           </div>
         ))
       ) : (

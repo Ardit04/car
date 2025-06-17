@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createCar, updateCar } from '../api/carService';
 
 const initialForm = {
+  id: '',
   brand: '',
   model: '',
   year: '',
@@ -16,12 +17,12 @@ const CarForm = ({ carToEdit, onSuccess }) => {
   useEffect(() => {
     if (carToEdit) {
       setForm({
-        id: carToEdit.id ?? '',
-        brand: carToEdit.brand ?? '',
-        model: carToEdit.model ?? '',
-        year: carToEdit.year ?? '',
-        price: carToEdit.price ?? '',
-        description: carToEdit.description ?? '',
+        id: carToEdit.id,
+        brand: carToEdit.brand || '',
+        model: carToEdit.model || '',
+        year: carToEdit.year || '',
+        price: carToEdit.price || '',
+        description: carToEdit.description || '',
         image: null,
       });
     } else {
@@ -38,21 +39,9 @@ const CarForm = ({ carToEdit, onSuccess }) => {
     setForm({ ...form, image: e.target.files[0] });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (form.id) {
-    // UPDATE
-    await updateCar(form.id, {
-      brand: form.brand,
-      model: form.model,
-      year: form.year,
-      price: form.price,
-      description: form.description,
-      imageUrl: null // Optional: handle update with/without image
-    });
-  } else {
-    // CREATE
     const formData = new FormData();
     formData.append('brand', form.brand);
     formData.append('model', form.model);
@@ -64,69 +53,29 @@ const CarForm = ({ carToEdit, onSuccess }) => {
     }
 
     try {
-      await createCar(formData);
-    } catch (error) {
-      alert("Failed to create car: " + error.message);
+      if (form.id) {
+        await updateCar(form.id, formData);
+      } else {
+        await createCar(formData);
+      }
+
+      setForm(initialForm);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      alert('Failed to save car: ' + err.message);
     }
-  }
-
-  setForm(initialForm);
-  if (onSuccess) onSuccess();
-};
-
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 bg-white shadow rounded">
       <h2 className="text-xl font-semibold">{form.id ? 'Edit' : 'Add'} Car</h2>
 
-      <input
-        name="brand"
-        placeholder="Brand"
-        value={form.brand}
-        onChange={handleChange}
-        required
-        className="w-full border p-2 rounded"
-      />
-      <input
-        name="model"
-        placeholder="Model"
-        value={form.model}
-        onChange={handleChange}
-        required
-        className="w-full border p-2 rounded"
-      />
-      <input
-        name="year"
-        placeholder="Year"
-        value={form.year}
-        onChange={handleChange}
-        required
-        className="w-full border p-2 rounded"
-      />
-      <input
-        name="price"
-        placeholder="Price"
-        value={form.price}
-        onChange={handleChange}
-        required
-        className="w-full border p-2 rounded"
-      />
-      <textarea
-        name="description"
-        placeholder="Description"
-        value={form.description}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      />
-      {!form.id && (
-        <input
-          type="file"
-          name="image"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="w-full border p-2 rounded"
-        />
-      )}
+      <input name="brand" placeholder="Brand" value={form.brand} onChange={handleChange} required className="w-full border p-2 rounded" />
+      <input name="model" placeholder="Model" value={form.model} onChange={handleChange} required className="w-full border p-2 rounded" />
+      <input name="year" placeholder="Year" value={form.year} onChange={handleChange} required className="w-full border p-2 rounded" />
+      <input name="price" placeholder="Price" value={form.price} onChange={handleChange} required className="w-full border p-2 rounded" />
+      <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="w-full border p-2 rounded" />
+      <input type="file" name="image" accept="image/*" onChange={handleFileChange} className="w-full border p-2 rounded" />
 
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
         {form.id ? 'Update' : 'Create'}

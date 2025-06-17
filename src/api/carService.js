@@ -1,45 +1,44 @@
 const BASE_URL = 'http://localhost/car/backend/api/cars';
 
 export const getCars = async () => {
-  const data = await fetch(`${BASE_URL}/index.php`);
-  const res = await data.json();
-  return res;
+  const response = await fetch(`${BASE_URL}/index.php`);
+  return await response.json();
 };
 
 export const createCar = async (formData) => {
-  try {
-    const response = await fetch(`${BASE_URL}/create.php`, {
-      method: 'POST',
-      body: formData,
-    });
+  const response = await fetch(`${BASE_URL}/create.php`, {
+    method: 'POST',
+    body: formData,
+  });
 
-    const result = await response.json();
+  const result = await response.json();
 
-    if (!response.ok) {
-      console.error("Failed to create car:", result);
-      throw new Error(result?.error || "Unknown error");
-    }
-
-    return result;
-  } catch (err) {
-    console.error("createCar() error:", err);
-    throw err;
+  if (!response.ok) {
+    throw new Error(result?.error || 'Failed to create car');
   }
+
+  return result;
 };
 
-
-export const updateCar = async (id, car) => {
-  const res = await fetch(`${BASE_URL}/update.php?id=${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(car),
+export const updateCar = async (id, formData) => {
+  const response = await fetch(`${BASE_URL}/update.php?id=${id}`, {
+    method: 'POST',
+    body: formData,
   });
-  return res.json();
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result?.error || 'Failed to update car');
+  }
+
+  return result;
 };
 
 export const deleteCar = async (id) => {
-  const res = await fetch(`${BASE_URL}/delete.php?id=${id}`, {
+  const response = await fetch(`${BASE_URL}/delete.php?id=${id}`, {
     method: 'DELETE',
   });
-  return res.json();
+
+  return await response.json();
 };

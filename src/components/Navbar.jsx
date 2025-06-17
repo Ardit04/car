@@ -40,11 +40,7 @@ const Navbar = ({ user, onLogout, vertical }) => {
                 Comment List
               </Link>
             </li>
-            <li>
-              <Link to="/admin/cars" className="hover:underline block" onClick={closeMenu}>
-                Car List
-              </Link>
-            </li>
+            
           </ul>
         </div>
         <div>
@@ -214,11 +210,7 @@ const Navbar = ({ user, onLogout, vertical }) => {
                   Comments
                 </Link>
               </li>
-              <li>
-                <Link to="/admin/cars" onClick={closeMenu} className="block hover:underline">
-                  Car List
-                </Link>
-              </li>
+            
               <li>
                 <button
                   onClick={() => {

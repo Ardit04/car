@@ -4,14 +4,14 @@ header("Content-Type: application/json");
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require_once '../../db/db.php';
+require_once '../../db/db.php'; // contains $pdo
 require_once '../../models/Comment.php';
 
 if (isset($_GET['user_id'])) {
     $userId = intval($_GET['user_id']);
 
     try {
-        $commentModel = new Comment($db);
+        $commentModel = new Comment($pdo); // ✅ use the correct variable
         $comments = $commentModel->getCommentsByUserId($userId);
 
         echo json_encode([

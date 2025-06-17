@@ -54,7 +54,6 @@ function App() {
               <Routes>
                 <Route path="/admin/add-car" element={<CarManager />} />
                 <Route path="/admin/comments" element={<CommentList userId={user?.id} />} />
-                <Route path="/admin/cars" element={<CarList user={user} />} /> {/* Admin car table view */}
                 <Route path="/admin" element={<Navigate to="/admin/add-car" />} />
                 <Route path="*" element={<Navigate to="/admin/add-car" />} />
               </Routes>

@@ -30,49 +30,7 @@ const CarList = ({ user }) => {
     console.log(`New comment added for car ${carId}:`, comment);
   };
 
-  // Show admin table view
-  if (user && user.role === 0) {
-    return (
-      <div className="p-6">
-        <h2 className="text-3xl text-center font-bold mb-6">Admin Car List</h2>
-        <table className="min-w-full border border-gray-300">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="border px-4 py-2">Photo</th>
-              <th className="border px-4 py-2">Brand</th>
-              <th className="border px-4 py-2">Model</th>
-              <th className="border px-4 py-2">Year</th>
-              <th className="border px-4 py-2">Price</th>
-              <th className="border px-4 py-2">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cars.map((car) => (
-              <tr key={car.id} className="text-center">
-                <td className="border px-4 py-2">
-                  {car.image_url ? (
-                    <img
-                      src={`http://localhost/car/backend/uploads/${car.image_url}`}
-                      alt={`${car.brand} ${car.model}`}
-                      className="w-24 h-16 object-contain mx-auto"
-                      loading="lazy"
-                    />
-                  ) : (
-                    'No Image'
-                  )}
-                </td>
-                <td className="border px-4 py-2">{car.brand}</td>
-                <td className="border px-4 py-2">{car.model}</td>
-                <td className="border px-4 py-2">{car.year}</td>
-                <td className="border px-4 py-2">${car.price}</td>
-                <td className="border px-4 py-2 truncate max-w-xs">{car.description || 'N/A'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
+
 
   // Otherwise, show regular user view with slider + grid cards
   return (

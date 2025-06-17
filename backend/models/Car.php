@@ -42,24 +42,31 @@ class Car {
 
 
     public function update($id, $data) {
-        $query = "UPDATE {$this->table} SET brand = ?, model = ?, year = ?, price = ?, description = ?, image_url = ? WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
-        $result = $stmt->execute([
-            $data['brand'],
-            $data['model'],
-            $data['year'],
-            $data['price'],
-            $data['description'] ?? null,
-            $data['image_url'] ?? null,
-            
-        ]);
+    $sql = "UPDATE cars SET brand = :brand, model = :model, year = :year, price = :price, description = :description";
 
-        if (!$result) {
-            error_log(print_r($stmt->errorInfo(), true));
-        }
-
-        return $result;
+    if (!empty($data['image_url'])) {
+        $sql .= ", image_url = :image_url";
     }
+
+    $sql .= " WHERE id = :id";
+
+    $stmt = $this->conn->prepare($sql);
+
+    $stmt->bindValue(':brand', $data['brand']);
+    $stmt->bindValue(':model', $data['model']);
+    $stmt->bindValue(':year', $data['year']);
+    $stmt->bindValue(':price', $data['price']);
+    $stmt->bindValue(':description', $data['description']);
+
+    if (!empty($data['image_url'])) {
+        $stmt->bindValue(':image_url', $data['image_url']);
+    }
+
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+    return $stmt->execute();
+}
+
 
     public function delete($id) {
         $query = "DELETE FROM {$this->table} WHERE id = ?";
