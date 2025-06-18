@@ -5,6 +5,10 @@ import AddToCartButton from './AddToCartButton';
 
 const CarList = ({ user }) => {
   const [cars, setCars] = useState([]);
+  const [filterModel, setFilterModel] = useState('');
+  const [filterBrand, setFilterBrand] = useState('');
+  const [filterYear, setFilterYear] = useState('');
+  const [filterPrice, setFilterPrice] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const loadCars = async () => {
@@ -18,11 +22,9 @@ const CarList = ({ user }) => {
 
   useEffect(() => {
     if (cars.length === 0) return;
-
     const interval = setInterval(() => {
       setCurrentSlide((prevIndex) => (prevIndex + 1) % cars.length);
     }, 3000);
-
     return () => clearInterval(interval);
   }, [cars]);
 
@@ -30,9 +32,28 @@ const CarList = ({ user }) => {
     console.log(`New comment added for car ${carId}:`, comment);
   };
 
+  const uniqueModels = [...new Set(cars.map((car) => car.model))];
+  const uniqueBrands = [...new Set(cars.map((car) => car.brand))];
+  const uniqueYears = [...new Set(cars.map((car) => car.year))].sort((a, b) => b - a);
+  const priceRanges = [
+    { label: 'All Prices', value: '' },
+    { label: 'Under $10,000', value: '10000' },
+    { label: 'Under $20,000', value: '20000' },
+    { label: 'Under $30,000', value: '30000' },
+    { label: 'Above $30,000', value: '30001' },
+  ];
 
+  const filteredCars = cars.filter((car) => {
+    const matchesModel = filterModel ? car.model === filterModel : true;
+    const matchesBrand = filterBrand ? car.brand === filterBrand : true;
+    const matchesYear = filterYear ? String(car.year) === filterYear : true;
+    const matchesPrice = filterPrice
+      ? (filterPrice === '30001' ? car.price > 30000 : car.price <= parseInt(filterPrice))
+      : true;
 
-  // Otherwise, show regular user view with slider + grid cards
+    return matchesModel && matchesBrand && matchesYear && matchesPrice;
+  });
+
   return (
     <div className="p-6">
       <h2 className="text-3xl text-center font-bold mb-6">The car of your dreams</h2>
@@ -59,9 +80,63 @@ const CarList = ({ user }) => {
         </div>
       )}
 
-      {/* Car grid */}
+      {/* Filters */}
+      {(!user || user?.role === 1) && (
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+
+          {/* Brand */}
+          <select
+            value={filterBrand}
+            onChange={(e) => setFilterBrand(e.target.value)}
+            className="p-2 border border-gray-300 rounded shadow-sm"
+          >
+            <option value="">All Brands</option>
+            {uniqueBrands.map((brand) => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </select>
+
+          {/* Model */}
+          <select
+            value={filterModel}
+            onChange={(e) => setFilterModel(e.target.value)}
+            className="p-2 border border-gray-300 rounded shadow-sm"
+          >
+            <option value="">All Models</option>
+            {uniqueModels.map((model) => (
+              <option key={model} value={model}>{model}</option>
+            ))}
+          </select>
+
+          {/* Year */}
+          <select
+            value={filterYear}
+            onChange={(e) => setFilterYear(e.target.value)}
+            className="p-2 border border-gray-300 rounded shadow-sm"
+          >
+            <option value="">All Years</option>
+            {uniqueYears.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+
+          {/* Price */}
+          <select
+            value={filterPrice}
+            onChange={(e) => setFilterPrice(e.target.value)}
+            className="p-2 border border-gray-300 rounded shadow-sm"
+          >
+            {priceRanges.map((range) => (
+              <option key={range.value} value={range.value}>{range.label}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Car Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {cars.map((car) => (
+        {filteredCars.map((car) => (
           <div
             key={car.id}
             className="bg-white p-4 rounded shadow-md hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col items-center"
