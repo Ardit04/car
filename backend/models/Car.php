@@ -22,16 +22,19 @@ class Car {
     }
 
    public function create($data) {
-    $query = "INSERT INTO {$this->table} (brand, model, year, price, description, image_url) VALUES (?, ?, ?, ?, ?, ?)";
-    $stmt = $this->conn->prepare($query);
-    $result = $stmt->execute([
-        $data['brand'],
-        $data['model'],
-        $data['year'],
-        $data['price'],
-        $data['description'] ?? null,
-        $data['image_url'] ?? null
-    ]);
+        $query = "INSERT INTO {$this->table} (brand, model, year, price, fuel, mileage, description, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $result = $stmt->execute([
+            $data['brand'],
+            $data['model'],
+            $data['year'],
+            $data['price'],
+            $data['fuel'],
+            $data['mileage'],
+            $data['description'] ?? null,
+            $data['image_url'] ?? null
+        ]);
+
 
     if (!$result) {
         return $stmt->errorInfo(); // Kthe error

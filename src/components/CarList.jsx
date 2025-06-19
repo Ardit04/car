@@ -9,6 +9,8 @@ const CarList = ({ user }) => {
   const [filterBrand, setFilterBrand] = useState('');
   const [filterYear, setFilterYear] = useState('');
   const [filterPrice, setFilterPrice] = useState('');
+  const [filterFuel, setFilterFuel] = useState('');
+  const [filterMileage, setFilterMileage] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const loadCars = async () => {
@@ -35,6 +37,8 @@ const CarList = ({ user }) => {
   const uniqueModels = [...new Set(cars.map((car) => car.model))];
   const uniqueBrands = [...new Set(cars.map((car) => car.brand))];
   const uniqueYears = [...new Set(cars.map((car) => car.year))].sort((a, b) => b - a);
+  const uniqueFuels = [...new Set(cars.map((car) => car.fuel))];
+
   const priceRanges = [
     { label: 'All Prices', value: '' },
     { label: 'Under $10,000', value: '10000' },
@@ -50,8 +54,17 @@ const CarList = ({ user }) => {
     const matchesPrice = filterPrice
       ? (filterPrice === '30001' ? car.price > 30000 : car.price <= parseInt(filterPrice))
       : true;
+    const matchesFuel = filterFuel ? car.fuel === filterFuel : true;
+    const matchesMileage = filterMileage ? car.mileage <= parseInt(filterMileage) : true;
 
-    return matchesModel && matchesBrand && matchesYear && matchesPrice;
+    return (
+      matchesModel &&
+      matchesBrand &&
+      matchesYear &&
+      matchesPrice &&
+      matchesFuel &&
+      matchesMileage
+    );
   });
 
   return (
@@ -76,15 +89,16 @@ const CarList = ({ user }) => {
             <p className="text-gray-700 font-medium">
               {cars[currentSlide].year} - ${cars[currentSlide].price}
             </p>
+            <p className="text-gray-500 text-sm">
+              Fuel: {cars[currentSlide].fuel}, Mileage: {cars[currentSlide].mileage} km
+            </p>
           </div>
         </div>
       )}
 
       {/* Filters */}
       {(!user || user?.role === 1) && (
-        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Brand */}
           <select
             value={filterBrand}
@@ -131,6 +145,27 @@ const CarList = ({ user }) => {
               <option key={range.value} value={range.value}>{range.label}</option>
             ))}
           </select>
+
+          {/* Fuel */}
+          <select
+            value={filterFuel}
+            onChange={(e) => setFilterFuel(e.target.value)}
+            className="p-2 border border-gray-300 rounded shadow-sm"
+          >
+            <option value="">All Fuel Types</option>
+            {uniqueFuels.map((fuel) => (
+              <option key={fuel} value={fuel}>{fuel}</option>
+            ))}
+          </select>
+
+          {/* Mileage */}
+          <input
+            type="number"
+            value={filterMileage}
+            onChange={(e) => setFilterMileage(e.target.value)}
+            placeholder="Max Mileage (km)"
+            className="p-2 border border-gray-300 rounded shadow-sm"
+          />
         </div>
       )}
 
@@ -166,6 +201,7 @@ const CarList = ({ user }) => {
               </div>
 
               <p className="text-gray-600">{car.year} - ${car.price}</p>
+              <p className="text-gray-500 text-sm">Fuel: {car.fuel}, Mileage: {car.mileage} km</p>
 
               {car.description && (
                 <p className="text-gray-500 text-sm mt-1 line-clamp-3">{car.description}</p>

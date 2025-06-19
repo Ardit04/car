@@ -7,9 +7,12 @@ const initialForm = {
   model: '',
   year: '',
   price: '',
+  fuel: '',
+  mileage: '',
   description: '',
   image: null,
 };
+
 
 const CarForm = ({ carToEdit, onSuccess }) => {
   const [form, setForm] = useState(initialForm);
@@ -22,9 +25,12 @@ const CarForm = ({ carToEdit, onSuccess }) => {
         model: carToEdit.model || '',
         year: carToEdit.year || '',
         price: carToEdit.price || '',
+        fuel: carToEdit.fuel || '',
+        mileage: carToEdit.mileage || '',
         description: carToEdit.description || '',
         image: null,
       });
+
     } else {
       setForm(initialForm);
     }
@@ -47,6 +53,8 @@ const CarForm = ({ carToEdit, onSuccess }) => {
     formData.append('model', form.model);
     formData.append('year', form.year);
     formData.append('price', form.price);
+    formData.append('fuel', form.fuel);
+    formData.append('mileage', form.mileage);
     formData.append('description', form.description);
     if (form.image) {
       formData.append('image', form.image);
@@ -74,6 +82,8 @@ const CarForm = ({ carToEdit, onSuccess }) => {
       <input name="model" placeholder="Model" value={form.model} onChange={handleChange} required className="w-full border p-2 rounded" />
       <input name="year" placeholder="Year" value={form.year} onChange={handleChange} required className="w-full border p-2 rounded" />
       <input name="price" placeholder="Price" value={form.price} onChange={handleChange} required className="w-full border p-2 rounded" />
+      <input name="fuel" placeholder="Fuel Type" value={form.fuel} onChange={handleChange} required className="w-full border p-2 rounded" />
+      <input name="mileage" placeholder="Mileage (km)" type="number" value={form.mileage} onChange={handleChange} required className="w-full border p-2 rounded" />
       <textarea name="description" placeholder="Description" value={form.description} onChange={handleChange} className="w-full border p-2 rounded" />
       <input type="file" name="image" accept="image/*" onChange={handleFileChange} className="w-full border p-2 rounded" />
 

@@ -19,11 +19,18 @@ $data = [
     'model' => $_POST['model'] ?? '',
     'year' => $_POST['year'] ?? '',
     'price' => $_POST['price'] ?? '',
+    'fuel' => $_POST['fuel'] ?? '',
+    'mileage' => $_POST['mileage'] ?? '',
     'description' => $_POST['description'] ?? '',
 ];
 
+// Nëse është ngarkuar një imazh i ri
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = '../../uploads/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
     $filename = uniqid() . '_' . basename($_FILES['image']['name']);
     $targetPath = $uploadDir . $filename;
 
@@ -38,4 +45,8 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 $car = new Car($pdo);
 $success = $car->update($id, $data);
 
-echo json_encode(['success' => $success]);
+if ($success) {
+    echo json_encode(['success' => true, 'message' => 'Car updated']);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Update failed']);
+}

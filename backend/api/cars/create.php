@@ -5,7 +5,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Include DB connection
 require_once '../../db/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -14,8 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Validate fields
-$required = ['brand', 'model', 'year', 'price', 'description'];
+$required = ['brand', 'model', 'year', 'price', 'fuel', 'mileage', 'description'];
 foreach ($required as $field) {
     if (empty($_POST[$field])) {
         http_response_code(400);
@@ -24,7 +22,6 @@ foreach ($required as $field) {
     }
 }
 
-// Handle image upload
 if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
     http_response_code(400);
     echo json_encode(['error' => 'Image upload failed']);
@@ -46,15 +43,16 @@ if (!move_uploaded_file($imageTmpPath, $uploadPath)) {
     exit;
 }
 
-// Insert into database
 try {
-    $stmt = $pdo->prepare("INSERT INTO cars (brand, model, year, price, description, image_url) 
-                           VALUES (:brand, :model, :year, :price, :description, :image_url)");
+    $stmt = $pdo->prepare("INSERT INTO cars (brand, model, year, price, fuel, mileage, description, image_url) 
+                           VALUES (:brand, :model, :year, :price, :fuel, :mileage, :description, :image_url)");
     $stmt->execute([
         ':brand' => $_POST['brand'],
         ':model' => $_POST['model'],
         ':year' => $_POST['year'],
         ':price' => $_POST['price'],
+        ':fuel' => $_POST['fuel'],
+        ':mileage' => $_POST['mileage'],
         ':description' => $_POST['description'],
         ':image_url' => $imageName
     ]);
@@ -67,6 +65,8 @@ try {
             'model' => $_POST['model'],
             'year' => $_POST['year'],
             'price' => $_POST['price'],
+            'fuel' => $_POST['fuel'],
+            'mileage' => $_POST['mileage'],
             'description' => $_POST['description'],
             'image_url' => $imageName
         ]

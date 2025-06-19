@@ -52,6 +52,8 @@ const CarManager = () => {
             <th className="px-4 py-2">Model</th>
             <th className="px-4 py-2">Year</th>
             <th className="px-4 py-2">Price</th>
+            <th className="px-4 py-2">Fuel</th>
+            <th className="px-4 py-2">Mileage (km)</th>
             <th className="px-4 py-2">Description</th>
             <th className="px-4 py-2">Actions</th>
           </tr>
@@ -75,6 +77,8 @@ const CarManager = () => {
               <td className="border px-4 py-2">{car.model}</td>
               <td className="border px-4 py-2">{car.year}</td>
               <td className="border px-4 py-2">${car.price}</td>
+              <td className="border px-4 py-2">{car.fuel}</td>
+              <td className="border px-4 py-2">{car.mileage} km</td>
               <td className="border px-4 py-2 truncate max-w-xs">{car.description || 'N/A'}</td>
               <td className="border px-4 py-2 space-x-2">
                 <button
