@@ -24,7 +24,6 @@ $data = [
     'description' => $_POST['description'] ?? '',
 ];
 
-// Nëse është ngarkuar një imazh i ri
 if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     $uploadDir = '../../uploads/';
     if (!is_dir($uploadDir)) {

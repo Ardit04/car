@@ -1,12 +1,19 @@
 const BASE_URL = 'http://localhost/car/backend/api/cart';
 
-export const addItemToCart = async (item) => {
-    const response = await fetch(`${BASE_URL}/add_item.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item), // correct JSON stringified body
-    });
-    return response.json();
+
+export const addItemToCart = async (formData) => {
+  const response = await fetch(`${BASE_URL}/add_item.php`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result?.error || 'Failed to create car');
+  }
+
+  return result;
 };
 
 export const removeItemFromCart = async (itemId) => {

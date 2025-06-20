@@ -1,14 +1,16 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
 ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+require_once '../../db/db.php';
+require_once '../../models/Cart.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-require_once '../../models/Cart.php';
-
-header('Content-Type: application/json');
 
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);

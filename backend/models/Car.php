@@ -37,7 +37,7 @@ class Car {
 
 
     if (!$result) {
-        return $stmt->errorInfo(); // Kthe error
+        return $stmt->errorInfo(); 
     }
 
     return true;
@@ -45,7 +45,7 @@ class Car {
 
 
     public function update($id, $data) {
-    $sql = "UPDATE cars SET brand = :brand, model = :model, year = :year, price = :price, description = :description";
+    $sql = "UPDATE cars SET brand = :brand, model = :model, year = :year, price = :price, fuel = :fuel, mileage = :mileage, description = :description";
 
     if (!empty($data['image_url'])) {
         $sql .= ", image_url = :image_url";
@@ -59,6 +59,8 @@ class Car {
     $stmt->bindValue(':model', $data['model']);
     $stmt->bindValue(':year', $data['year']);
     $stmt->bindValue(':price', $data['price']);
+    $stmt->bindValue(':fuel', $data['fuel']);
+    $stmt->bindValue(':mileage', $data['mileage']);
     $stmt->bindValue(':description', $data['description']);
 
     if (!empty($data['image_url'])) {
