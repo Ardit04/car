@@ -1,10 +1,15 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
 
+require_once '../../db/db.php';
 require_once '../../models/Cart.php';
 
-$cart = new Cart();
-$data = json_decode(file_get_contents('php://input'), true);
-echo json_encode($cart->removeItem($data['id']));
+$data = json_decode(file_get_contents("php://input"), true);
+
+$cart = new Cart($pdo);
+$success = $cart->removeItem($data['id']);
+
+echo json_encode([
+    'message' => $success ? 'Item removed.' : 'Failed to remove item.'
+]);
