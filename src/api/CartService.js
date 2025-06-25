@@ -8,6 +8,7 @@ export const addItemToCart = async (item) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // ⬅️ this is the key fix!
       body: JSON.stringify(item),
     });
 
@@ -32,6 +33,7 @@ export const addItemToCart = async (item) => {
   }
 };
 
+
 // ✅ Remove item from cart
 export const removeItemFromCart = async (itemId) => {
   try {
@@ -52,7 +54,10 @@ export const removeItemFromCart = async (itemId) => {
 // ✅ View cart items
 export const viewCart = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/view_cart.php`);
+    const response = await fetch(`${BASE_URL}/view_cart.php`, {
+      credentials: 'include' 
+    });
+
     const contentType = response.headers.get("content-type");
 
     if (!contentType || !contentType.includes("application/json")) {

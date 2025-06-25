@@ -67,15 +67,6 @@ export default function SignupForm() {
         required
       />
 
-      <input
-        name="number"
-        value={form.number}
-        onChange={handleChange}
-        type="number"
-        placeholder="Phone Number"
-        className="w-full border p-2 rounded"
-        required
-      />
 
       <button
         type="submit"

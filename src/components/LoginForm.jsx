@@ -16,6 +16,7 @@ export default function LoginForm({ onLogin }) {
       const res = await fetch("http://localhost/car/backend/api/auth/login.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(form),
       });
 
