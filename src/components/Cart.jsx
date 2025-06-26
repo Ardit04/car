@@ -53,7 +53,7 @@ const Cart = () => {
       const response = await checkout(totalPrice);
       if (response?.message) {
         alert(response.message);
-        await handleClearCart();  // Pas pagesës, boshatis cart-in
+        await handleClearCart(); 
       } else {
         alert('Checkout failed: ' + (response.error || 'Unknown error'));
       }

@@ -26,7 +26,6 @@ class Cart {
         return ['error' => 'Missing item ID'];
     }
 
-    // Kontrollo nëse item-i ekziston tashmë në cart për këtë user
     $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM cart WHERE item_id = ? AND user_id = ?");
     $stmt->execute([$itemId, $userId]);
     $exists = $stmt->fetchColumn();
@@ -35,7 +34,6 @@ class Cart {
         return ['error' => 'Item already in cart'];
     }
 
-    // Merr info e veturës nga tabela cars
     $stmt = $this->pdo->prepare("SELECT * FROM cars WHERE id = ?");
     $stmt->execute([$itemId]);
     $car = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -44,7 +42,6 @@ class Cart {
         return ['error' => 'Car not found'];
     }
 
-    // Shto item-in në cart
     $stmt = $this->pdo->prepare("
         INSERT INTO cart (item_id, user_id, price, brand, model, image_url, mileage, fuel, year, description)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

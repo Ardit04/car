@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-header("Access-Control-Allow-Origin: http://localhost:3000"); // vendos URL frontend-it
+header("Access-Control-Allow-Origin: http://localhost:3000"); 
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -29,12 +29,10 @@ if ($total <= 0) {
 }
 
 try {
-    // Ruaj pagesën në DB (tabela 'payments' ose 'orders' duhet të ekzistojë)
     $stmt = $pdo->prepare("INSERT INTO payments (user_id, total_amount, payment_date, status) VALUES (?, ?, NOW(), ?)");
-    $status = 'paid'; // ose 'pending' varësisht nga logjika
+    $status = 'paid';
     $stmt->execute([$userId, $total, $status]);
 
-    // Pas pagesës, mund ta fshish cart-in e user-it
     $stmt2 = $pdo->prepare("DELETE FROM cart WHERE user_id = ?");
     $stmt2->execute([$userId]);
 
