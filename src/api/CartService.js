@@ -1,29 +1,39 @@
 const BASE_URL = 'http://localhost/car/backend/api/cart';
 
-// ✅ Add item to cart
+export const checkout = async (total) => {
+  try {
+    const response = await fetch(`${BASE_URL}/checkout.php`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ total }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Checkout failed:', error);
+    return { error: error.message };
+  }
+};
+
 export const addItemToCart = async (item) => {
   try {
     const response = await fetch(`${BASE_URL}/add_item.php`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // ⬅️ this is the key fix!
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',  
       body: JSON.stringify(item),
     });
 
     const contentType = response.headers.get("content-type");
-
-    if (!contentType || !contentType.includes("application/json")) {
+    if (!contentType?.includes("application/json")) {
       const text = await response.text();
-      console.error("Server returned non-JSON:", text);
       throw new Error("Server error: Invalid response format");
     }
 
     const result = await response.json();
-
     if (!response.ok || result.error) {
-      throw new Error(result?.error || 'Failed to add item to cart');
+      throw new Error(result.error || 'Failed to add item to cart');
     }
 
     return result;
@@ -34,12 +44,12 @@ export const addItemToCart = async (item) => {
 };
 
 
-// ✅ Remove item from cart
 export const removeItemFromCart = async (itemId) => {
   try {
     const response = await fetch(`${BASE_URL}/remove_item.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ id: itemId }),
     });
 
@@ -51,16 +61,16 @@ export const removeItemFromCart = async (itemId) => {
   }
 };
 
-// ✅ View cart items
+
+
 export const viewCart = async () => {
   try {
     const response = await fetch(`${BASE_URL}/view_cart.php`, {
-      credentials: 'include' 
+      credentials: 'include'
     });
 
     const contentType = response.headers.get("content-type");
-
-    if (!contentType || !contentType.includes("application/json")) {
+    if (!contentType?.includes("application/json")) {
       const text = await response.text();
       console.error("Non-JSON response from view_cart.php:", text);
       return [];
@@ -74,12 +84,12 @@ export const viewCart = async () => {
   }
 };
 
-// ✅ Clear entire cart
 export const clearCart = async () => {
   try {
     const response = await fetch(`${BASE_URL}/clear_cart.php`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include', 
       body: JSON.stringify({}),
     });
 
@@ -90,3 +100,4 @@ export const clearCart = async () => {
     return { error: error.message };
   }
 };
+

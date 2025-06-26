@@ -1,17 +1,17 @@
 import React from 'react';
-import { removeItemFromCart } from '../api/CartService';
 
 const CartItem = ({ item, onRemove }) => {
-  const handleRemove = async () => {
-    const response = await removeItemFromCart(item.item_id);
-    alert(response.message);
-    onRemove(item.item_id);
-  };
+  const imageName = item.image_url;
+  const imageUrl = imageName
+  ? `http://localhost/car/uploads/${imageName}`
+  : 'https://via.placeholder.com/200x130?text=No+Image';
+
+
 
   return (
     <div className="border rounded-lg shadow-md p-4 mb-4 flex flex-col md:flex-row gap-4">
       <img
-        src={`http://localhost/car/uploads/${item.photo}`}
+        src={imageUrl}
         alt={`${item.brand} ${item.model}`}
         className="w-full md:w-48 h-32 object-cover rounded"
       />
@@ -25,7 +25,7 @@ const CartItem = ({ item, onRemove }) => {
           <strong>Price in Cart:</strong> €{item.cart_price}
         </p>
         <button
-          onClick={handleRemove}
+          onClick={() => onRemove(item.item_id)}
           className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
           Remove from Cart

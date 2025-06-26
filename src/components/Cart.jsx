@@ -1,40 +1,103 @@
 import React, { useEffect, useState } from 'react';
-import { viewCart, clearCart } from '../api/CartService';
+import { viewCart, clearCart, removeItemFromCart, checkout } from '../api/CartService';
 import CartItem from './CartItem';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const items = await viewCart();
+      setCartItems(Array.isArray(items) ? items : []);
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+      setCartItems([]);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchCart = async () => {
-      const items = await viewCart();
-      console.log("Fetched cart items:", items);
-      setCartItems(items);
-    };
     fetchCart();
   }, []);
 
   const handleClearCart = async () => {
     const response = await clearCart();
-    alert(response.message);
-    setCartItems([]);
+    if (response?.message) {
+      alert(response.message);
+      fetchCart();
+    } else {
+      console.error(response?.error || 'Clear cart failed');
+    }
   };
 
-  const handleRemoveItem = (itemId) => {
-    setCartItems(cartItems.filter(item => item.id !== itemId));
+  const handleRemoveItem = async (itemId) => {
+    const res = await removeItemFromCart(itemId);
+    if (res.message) {
+      fetchCart();
+    } else {
+      console.error(res.error || 'Failed to remove item');
+    }
+  };
+
+  const totalPrice = cartItems.reduce((sum, item) => sum + parseFloat(item.cart_price || 0), 0);
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    try {
+      const response = await checkout(totalPrice);
+      if (response?.message) {
+        alert(response.message);
+        await handleClearCart();  // Pas pagesës, boshatis cart-in
+      } else {
+        alert('Checkout failed: ' + (response.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Checkout failed. Please try again later.');
+    }
   };
 
   return (
-    <div>
-      <h2>Your Cart</h2>
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+    <div className="p-4">
+      <h2 className="text-2xl font-semibold mb-4">Your Cart</h2>
+
+      {loading ? (
+        <p className="text-gray-500 italic">Loading cart...</p>
+      ) : cartItems.length === 0 ? (
+        <p className="text-gray-600 italic">Your cart is empty.</p>
       ) : (
-        cartItems.map(item => (
-          <CartItem key={item.id} item={item} onRemove={handleRemoveItem} />
-        ))
+        <>
+          {cartItems.map((item, index) => (
+            <CartItem key={item.item_id || index} item={item} onRemove={handleRemoveItem} />
+          ))}
+
+          <div className="mt-6 p-4 bg-gray-100 rounded text-lg font-medium text-gray-800">
+            Total: <span className="text-green-600 font-bold">€{totalPrice.toFixed(2)}</span>
+          </div>
+
+          <div className="flex gap-4 mt-4">
+            <button
+              onClick={handleClearCart}
+              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800"
+            >
+              Clear Cart
+            </button>
+
+            <button
+              onClick={handleCheckout}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Checkout
+            </button>
+          </div>
+        </>
       )}
-      <button onClick={handleClearCart}>Clear Cart</button>
     </div>
   );
 };
