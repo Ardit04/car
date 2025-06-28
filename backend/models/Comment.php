@@ -8,11 +8,17 @@ class Comment {
     }
 
     public function getAll() {
-        $query = "SELECT * FROM {$this->table}";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
-    }
+    $query = "
+        SELECT c.id, c.comment, c.car_id, c.user_id, u.username AS user_name
+        FROM {$this->table} c
+        LEFT JOIN users u ON c.user_id = u.id
+        ORDER BY c.id DESC
+    ";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt;
+}
+
 
     public function getCommentsByUserId($userId) {
     $query = "
@@ -48,9 +54,17 @@ class Comment {
     }
 
     public function delete($id) {
-        $query = "DELETE FROM {$this->table} WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+    $query = "DELETE FROM {$this->table} WHERE id = :id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $result = $stmt->execute();
+
+    if (!$result) {
+        $error = $stmt->errorInfo();
+        error_log("Delete failed: " . implode(", ", $error));
     }
+
+    return $result;
+}
+
 }

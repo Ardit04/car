@@ -53,7 +53,7 @@ function App() {
             <div className="w-4/5 p-6">
               <Routes>
                 <Route path="/admin/add-car" element={<CarManager />} />
-                <Route path="/admin/comments" element={<CommentList userId={user?.id} />} />
+                <Route path="/admin/comments" element={<CommentList />} />
                 <Route path="/admin" element={<Navigate to="/admin/add-car" />} />
                 <Route path="*" element={<Navigate to="/admin/add-car" />} />
               </Routes>

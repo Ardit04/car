@@ -1,13 +1,18 @@
 const BASE_URL = 'http://localhost/car/backend/api/comments';
 
-export const getComments = async (userId) => {
-  const response = await fetch(`http://localhost/car/backend/api/comments/index_comment.php?user_id=${userId}`);
+export const getComments = async (userId = null) => {
+  let url = 'http://localhost/car/backend/api/comments/index_comment.php';
+  if (userId) {
+    url += `?user_id=${userId}`;
+  }
 
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error('Failed to fetch comments');
   }
   return response.json();
 };
+
 
 
 export const createComment = async (comment) => {
@@ -38,8 +43,7 @@ export const deleteComment = async (id) => {
   const res = await fetch(`${BASE_URL}/delete.php?id=${id}`, {
     method: 'DELETE',
   });
-  if (!res.ok) {
-    throw new Error('Failed to delete comment');
-  }
+  if (!res.ok) throw new Error('Failed to delete comment');
   return res.json();
 };
+
