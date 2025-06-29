@@ -40,6 +40,12 @@ const Navbar = ({ user, onLogout, vertical }) => {
                 Comment List
               </Link>
             </li>
+            <li>
+              <Link to="/admin/contact-messages" className="hover:underline block" onClick={closeMenu}>
+                Contact Messages
+              </Link>
+            </li>
+
             
           </ul>
         </div>

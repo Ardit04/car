@@ -25,5 +25,22 @@ class Contact {
         throw new Exception("SQL execute failed: " . implode(", ", $stmt->errorInfo()));
     }
 }
+    public function getAll() {
+    $sql = "SELECT * FROM contacts ORDER BY id DESC";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+    public function delete($id) {
+        $query = "DELETE FROM {$this->table} WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $result = $stmt->execute([$id]);
+
+        if (!$result) {
+            error_log(print_r($stmt->errorInfo(), true));
+        }
+
+        return $result;
+    }
 
 }

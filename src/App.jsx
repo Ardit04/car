@@ -12,6 +12,7 @@ import Cart from './components/Cart';
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
 import Footer from './components/Footer';
+import AdminContactMessages from './components/AdminContactMessages';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -54,6 +55,7 @@ function App() {
               <Routes>
                 <Route path="/admin/add-car" element={<CarManager />} />
                 <Route path="/admin/comments" element={<CommentList />} />
+                <Route path="/admin/contact-messages" element={<AdminContactMessages />} />
                 <Route path="/admin" element={<Navigate to="/admin/add-car" />} />
                 <Route path="*" element={<Navigate to="/admin/add-car" />} />
               </Routes>
