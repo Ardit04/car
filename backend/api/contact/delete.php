@@ -14,7 +14,8 @@ if (!$id) {
     exit;
 }
 
-$car = new Car($pdo);
-$success = $car->delete($id);
+$contact = new Contact($pdo);
+$success = $contact->delete($id);
+
 
 echo json_encode(['success' => $success]);

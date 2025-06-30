@@ -19,7 +19,7 @@ const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this message?')) {
       try {
         await deleteMessage(id);
-        loadCars();
+        fetchMessages();
       } catch (error) {
         console.error('Failed to delete message:', error);
       }

@@ -1,8 +1,9 @@
 <?php
 
-require_once '../../db/db.php'; // <-- this includes the $pdo object
+require_once '../../db/db.php'; 
 
 class Contact {
+    private $table = 'contacts';
     private $pdo;
 
     public function __construct($pdo) {
@@ -33,7 +34,7 @@ class Contact {
 }
     public function delete($id) {
         $query = "DELETE FROM {$this->table} WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
+        $stmt = $this->pdo->prepare($query);
         $result = $stmt->execute([$id]);
 
         if (!$result) {

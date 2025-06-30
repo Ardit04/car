@@ -40,7 +40,7 @@ export const updateComment = async (id, text) => {
 };
 
 export const deleteComment = async (id) => {
-  const res = await fetch(`${BASE_URL}/delete.php?id=${id}`, {
+  const res = await fetch(`${BASE_URL}/delete_comment.php?id=${id}`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error('Failed to delete comment');
