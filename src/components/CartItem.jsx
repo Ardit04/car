@@ -3,7 +3,7 @@ import React from 'react';
 const CartItem = ({ item, onRemove }) => {
   const imageName = item.image_url;
   const imageUrl = imageName
-  ? `http://localhost/car/uploads/${imageName}`
+  ? `http://localhost/car/backend/uploads/${imageName}`
   : 'https://via.placeholder.com/200x130?text=No+Image';
 
 
