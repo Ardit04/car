@@ -3,18 +3,19 @@ import React from 'react';
 const CartItem = ({ item, onRemove }) => {
   const imageName = item.image_url;
   const imageUrl = imageName
-  ? `http://localhost/car/backend/uploads/${imageName}`
-  : 'https://via.placeholder.com/200x130?text=No+Image';
-
-
+    ? `http://localhost/car/backend/uploads/${imageName}`
+    : 'https://via.placeholder.com/200x130?text=No+Image';
 
   return (
     <div className="border rounded-lg shadow-md p-4 mb-4 flex flex-col md:flex-row gap-4">
-      <img
-        src={imageUrl}
-        alt={`${item.brand} ${item.model}`}
-        className="w-full md:w-48 h-32 object-cover rounded"
-      />
+      <div className="w-full md:w-72 max-h-[300px] flex justify-center items-center">
+        <img
+          src={imageUrl}
+          alt={`${item.brand} ${item.model}`}
+          className="w-full h-auto max-h-[300px] object-contain rounded"
+        />
+      </div>
+
       <div className="flex-1">
         <h3 className="text-xl font-bold">{item.brand} {item.model} ({item.year})</h3>
         <p className="text-sm text-gray-600 mb-2 italic">{item.description}</p>
