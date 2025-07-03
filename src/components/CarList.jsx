@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getCars } from '../api/carService';
 import CommentForm from './CommentForm';
 import AddToCartButton from './AddToCartButton';
 
+const sliderVariants = {
+  enter: { opacity: 0, x: 50 },
+  center: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -50 },
+};
+
 const CarList = ({ user }) => {
   const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filterModel, setFilterModel] = useState('');
   const [filterBrand, setFilterBrand] = useState('');
   const [filterYear, setFilterYear] = useState('');
@@ -13,32 +21,30 @@ const CarList = ({ user }) => {
   const [filterMileage, setFilterMileage] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const loadCars = async () => {
-    const data = await getCars();
-    setCars(data);
-  };
-
+  // Fetch cars
   useEffect(() => {
-    loadCars();
+    (async () => {
+      setLoading(true);
+      const data = await getCars();
+      setCars(data);
+      setLoading(false);
+    })();
   }, []);
 
+  // Slider auto change
   useEffect(() => {
     if (cars.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prevIndex) => (prevIndex + 1) % cars.length);
-    }, 3000);
+      setCurrentSlide((prev) => (prev + 1) % cars.length);
+    }, 4000);
     return () => clearInterval(interval);
   }, [cars]);
 
-  const handleCommentAdded = (carId, comment) => {
-    console.log(`New comment added for car ${carId}:`, comment);
-  };
-
-  const uniqueModels = [...new Set(cars.map((car) => car.model))];
-  const uniqueBrands = [...new Set(cars.map((car) => car.brand))];
-  const uniqueYears = [...new Set(cars.map((car) => car.year))].sort((a, b) => b - a);
-  const uniqueFuels = [...new Set(cars.map((car) => car.fuel))];
-
+  // Unique filter options
+  const uniqueModels = [...new Set(cars.map((c) => c.model))];
+  const uniqueBrands = [...new Set(cars.map((c) => c.brand))];
+  const uniqueYears = [...new Set(cars.map((c) => c.year))].sort((a, b) => b - a);
+  const uniqueFuels = [...new Set(cars.map((c) => c.fuel))];
   const priceRanges = [
     { label: 'All Prices', value: '' },
     { label: 'Under $10,000', value: '10000' },
@@ -47,178 +53,237 @@ const CarList = ({ user }) => {
     { label: 'Above $30,000', value: '30001' },
   ];
 
+  // Filter logic
   const filteredCars = cars.filter((car) => {
-    const matchesModel = filterModel ? car.model === filterModel : true;
-    const matchesBrand = filterBrand ? car.brand === filterBrand : true;
-    const matchesYear = filterYear ? String(car.year) === filterYear : true;
-    const matchesPrice = filterPrice
-      ? (filterPrice === '30001' ? car.price > 30000 : car.price <= parseInt(filterPrice))
-      : true;
-    const matchesFuel = filterFuel ? car.fuel === filterFuel : true;
-    const matchesMileage = filterMileage ? car.mileage <= parseInt(filterMileage) : true;
-
-    return (
-      matchesModel &&
-      matchesBrand &&
-      matchesYear &&
-      matchesPrice &&
-      matchesFuel &&
-      matchesMileage
-    );
+    if (filterModel && car.model !== filterModel) return false;
+    if (filterBrand && car.brand !== filterBrand) return false;
+    if (filterYear && String(car.year) !== filterYear) return false;
+    if (filterPrice) {
+      if (filterPrice === '30001' && car.price <= 30000) return false;
+      if (filterPrice !== '30001' && car.price > parseInt(filterPrice)) return false;
+    }
+    if (filterFuel && car.fuel !== filterFuel) return false;
+    if (filterMileage && car.mileage > parseInt(filterMileage)) return false;
+    return true;
   });
 
+  // Clear filters helper
+  const clearFilters = () => {
+    setFilterBrand('');
+    setFilterModel('');
+    setFilterYear('');
+    setFilterPrice('');
+    setFilterFuel('');
+    setFilterMileage('');
+  };
+
   return (
-    <div className="p-6">
-      <h2 className="text-3xl text-center font-bold mb-6">The car of your dreams</h2>
+    <div className="max-w-7xl mx-auto px-6 py-10">
+      <h2 className="text-5xl font-extrabold text-center mb-14 text-gray-900">
+        The Car of Your Dreams
+      </h2>
 
       {/* Slider */}
-      {cars.length > 0 && (
-        <div className="w-full mb-10 flex flex-col items-center">
-          {cars[currentSlide].image_url && (
-            <img
-              src={`http://localhost/car/backend/uploads/${cars[currentSlide].image_url}`}
-              alt={`${cars[currentSlide].brand} ${cars[currentSlide].model}`}
-              className="w-full max-h-[400px] object-contain rounded"
-              loading="lazy"
-            />
-          )}
-          <div className="mt-4 text-center">
-            <h3 className="text-2xl md:text-3xl font-semibold">
-              {cars[currentSlide].brand} {cars[currentSlide].model}
-            </h3>
-            <p className="text-gray-700 font-medium">
-              {cars[currentSlide].year} - ${cars[currentSlide].price}
-            </p>
-            <p className="text-gray-500 text-sm">
-              Fuel: {cars[currentSlide].fuel}, Mileage: {cars[currentSlide].mileage} km
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      {(!user || user?.role === 1) && (
-        <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {/* Brand */}
-          <select
-            value={filterBrand}
-            onChange={(e) => setFilterBrand(e.target.value)}
-            className="p-2 border border-gray-300 rounded shadow-sm"
-          >
-            <option value="">All Brands</option>
-            {uniqueBrands.map((brand) => (
-              <option key={brand} value={brand}>{brand}</option>
-            ))}
-          </select>
-
-          {/* Model */}
-          <select
-            value={filterModel}
-            onChange={(e) => setFilterModel(e.target.value)}
-            className="p-2 border border-gray-300 rounded shadow-sm"
-          >
-            <option value="">All Models</option>
-            {uniqueModels.map((model) => (
-              <option key={model} value={model}>{model}</option>
-            ))}
-          </select>
-
-          {/* Year */}
-          <select
-            value={filterYear}
-            onChange={(e) => setFilterYear(e.target.value)}
-            className="p-2 border border-gray-300 rounded shadow-sm"
-          >
-            <option value="">All Years</option>
-            {uniqueYears.map((year) => (
-              <option key={year} value={year}>{year}</option>
-            ))}
-          </select>
-
-          {/* Price */}
-          <select
-            value={filterPrice}
-            onChange={(e) => setFilterPrice(e.target.value)}
-            className="p-2 border border-gray-300 rounded shadow-sm"
-          >
-            {priceRanges.map((range) => (
-              <option key={range.value} value={range.value}>{range.label}</option>
-            ))}
-          </select>
-
-          {/* Fuel */}
-          <select
-            value={filterFuel}
-            onChange={(e) => setFilterFuel(e.target.value)}
-            className="p-2 border border-gray-300 rounded shadow-sm"
-          >
-            <option value="">All Fuel Types</option>
-            {uniqueFuels.map((fuel) => (
-              <option key={fuel} value={fuel}>{fuel}</option>
-            ))}
-          </select>
-
-          {/* Mileage */}
-          <input
-            type="number"
-            value={filterMileage}
-            onChange={(e) => setFilterMileage(e.target.value)}
-            placeholder="Max Mileage (km)"
-            className="p-2 border border-gray-300 rounded shadow-sm"
-          />
-        </div>
-      )}
-
-      {/* Car Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredCars.map((car) => (
-          <div
-            key={car.id}
-            className="bg-white p-4 rounded shadow-md hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col items-center"
-          >
-            {car.image_url && (
-              <div className="w-full aspect-video bg-gray-50 flex items-center justify-center overflow-hidden rounded mb-3">
+      <div className="relative max-w-5xl mx-auto mb-16 rounded-2xl overflow-hidden shadow-lg bg-white">
+        <AnimatePresence mode="wait">
+          {cars.length > 0 && (
+            <motion.div
+              key={cars[currentSlide].id}
+              variants={sliderVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.8 }}
+              className="flex flex-col items-center p-8"
+            >
+              <div className="w-full h-72 sm:h-96 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden mb-6">
                 <img
-                  src={`http://localhost/car/backend/uploads/${car.image_url}`}
-                  alt={`${car.brand} ${car.model}`}
+                  src={`http://localhost/car/backend/uploads/${cars[currentSlide].image_url}`}
+                  alt={`${cars[currentSlide].brand} ${cars[currentSlide].model}`}
                   className="max-h-full max-w-full object-contain"
                   loading="lazy"
                 />
               </div>
-            )}
 
-            <div className="w-full">
-              <div className="flex justify-between items-center mb-1">
-                <h4 className="text-lg font-bold">
-                  {car.brand} {car.model}
-                </h4>
+              <h3 className="text-4xl font-semibold text-gray-900">
+                {cars[currentSlide].brand} {cars[currentSlide].model}
+              </h3>
+              <p className="text-lg text-gray-700 mt-1 font-medium">
+                {cars[currentSlide].year} - ${cars[currentSlide].price.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Fuel: {cars[currentSlide].fuel}, Mileage: {cars[currentSlide].mileage.toLocaleString()} km
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-                {user?.role === 1 && (
-                  <AddToCartButton
-                    item={{ id: car.id, name: `${car.brand} ${car.model}`, price: car.price }}
-                  />
-                )}
-              </div>
-
-              <p className="text-gray-600">{car.year} - ${car.price}</p>
-              <p className="text-gray-500 text-sm">Fuel: {car.fuel}, Mileage: {car.mileage} km</p>
-
-              {car.description && (
-                <p className="text-gray-500 text-sm mt-1 line-clamp-3">{car.description}</p>
-              )}
-
-              {user?.role === 1 && (
-                <div className="mt-2">
-                  <CommentForm
-                    userId={user.id}
-                    carId={car.id}
-                    onCommentAdded={(comment) => handleCommentAdded(car.id, comment)}
-                  />
-                </div>
-              )}
+      {/* Filters: sticky on top on scroll */}
+      {(!user || user?.role === 1) && (
+        <div className="sticky top-20 bg-white z-20 p-6 rounded-xl shadow-md mb-12 flex flex-wrap gap-5 justify-center">
+          {[{
+            label: 'Brand',
+            value: filterBrand,
+            onChange: setFilterBrand,
+            options: uniqueBrands,
+            placeholder: 'All Brands'
+          },
+          {
+            label: 'Model',
+            value: filterModel,
+            onChange: setFilterModel,
+            options: uniqueModels,
+            placeholder: 'All Models'
+          },
+          {
+            label: 'Year',
+            value: filterYear,
+            onChange: setFilterYear,
+            options: uniqueYears,
+            placeholder: 'All Years'
+          },
+          {
+            label: 'Price',
+            value: filterPrice,
+            onChange: setFilterPrice,
+            options: priceRanges.map(p => p.label),
+            values: priceRanges.map(p => p.value),
+            placeholder: ''
+          },
+          {
+            label: 'Fuel',
+            value: filterFuel,
+            onChange: setFilterFuel,
+            options: uniqueFuels,
+            placeholder: 'All Fuel Types'
+          }].map(({ label, value, onChange, options, placeholder, values }) => (
+            <div key={label} className="flex flex-col min-w-[140px]">
+              <label htmlFor={label.toLowerCase()} className="text-gray-600 font-semibold mb-1 select-none">
+                {label}
+              </label>
+              <select
+                id={label.toLowerCase()}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+              >
+                <option value="">{placeholder || `All ${label}s`}</option>
+                {options.map((opt, idx) => (
+                  <option key={opt} value={values ? values[idx] : opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
             </div>
+          ))}
+          <div className="flex flex-col min-w-[140px]">
+            <label htmlFor="mileage" className="text-gray-600 font-semibold mb-1 select-none">
+              Max Mileage (km)
+            </label>
+            <input
+              id="mileage"
+              type="number"
+              value={filterMileage}
+              onChange={(e) => setFilterMileage(e.target.value)}
+              min={0}
+              placeholder="Any"
+              className="p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 transition"
+            />
           </div>
-        ))}
+
+          <button
+            onClick={clearFilters}
+            className="self-end px-5 py-3 bg-yellow-400 hover:bg-yellow-300 rounded-lg font-semibold shadow-md transition whitespace-nowrap"
+            aria-label="Clear all filters"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
+
+      {/* Cars Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+        <AnimatePresence>
+          {loading ? (
+            [...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="h-80 bg-gray-200 rounded-xl animate-pulse"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+            ))
+          ) : filteredCars.length > 0 ? (
+            filteredCars.map((car) => (
+              <motion.div
+                key={car.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-[1.05] transition-transform duration-300 flex flex-col"
+                aria-label={`${car.brand} ${car.model} car card`}
+              >
+                {car.image_url && (
+                  <div className="aspect-[16/9] bg-gray-50 rounded-t-2xl overflow-hidden flex items-center justify-center">
+                    <img
+                      src={`http://localhost/car/backend/uploads/${car.image_url}`}
+                      alt={`${car.brand} ${car.model}`}
+                      className="max-h-full max-w-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+
+                <div className="p-6 flex flex-col flex-grow">
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="text-xl font-bold text-gray-900">
+                      {car.brand} {car.model}
+                    </h4>
+
+                    {user?.role === 1 && (
+                      <AddToCartButton
+                        item={{ id: car.id, name: `${car.brand} ${car.model}`, price: car.price }}
+                      />
+                    )}
+                  </div>
+
+                  <p className="text-gray-800 font-semibold mb-1">
+                    {car.year} - ${car.price.toLocaleString()}
+                  </p>
+                  <p className="text-gray-600 text-sm mb-3">
+                    Fuel: {car.fuel}, Mileage: {car.mileage.toLocaleString()} km
+                  </p>
+
+                  {car.description && (
+                    <p className="text-gray-700 text-sm line-clamp-3 mb-4">{car.description}</p>
+                  )}
+
+                  {user?.role === 1 && (
+                    <div className="mt-auto">
+                      <CommentForm
+                        userId={user.id}
+                        carId={car.id}
+                        onCommentAdded={(comment) => handleCommentAdded(car.id, comment)}
+                      />
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="col-span-full text-center text-gray-500 mt-24 text-lg"
+            >
+              Sorry, no cars match your criteria.
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

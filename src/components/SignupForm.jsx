@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-export default function SignupForm() {
-  const [form, setForm] = useState({ username: "", email: "", password: "", number: "" });
+export default function SignupForm({ onSignup }) {
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -11,6 +16,13 @@ export default function SignupForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
+    if (form.password !== form.confirmPassword) {
+      setMessage("Passwords do not match.");
+      return;
+    }
+
     try {
       const res = await fetch("http://localhost/car/backend/api/auth/signup.php", {
         method: "POST",
@@ -18,71 +30,93 @@ export default function SignupForm() {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
       const data = await res.json();
-      setMessage(data.message);
-
       if (data.status === "success") {
-        setTimeout(() => navigate("/login"), 2000); // Ridhegjo pas 2 sekondash
+        onSignup(data.user);
+        setMessage(`Welcome ${data.user.username}!`);
+        navigate("/");
+      } else {
+        setMessage(data.message || "Signup failed.");
       }
     } catch (error) {
       console.error("Error during fetch:", error);
-      setMessage("Failed to sign up. Please try again.");
+      setMessage(
+        "An error occurred while connecting to the server. Please try again."
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm mx-auto p-4 shadow-md rounded-xl space-y-3">
-      <h2 className="text-xl font-semibold">Sign Up</h2>
-
-      <input
-        name="username"
-        value={form.username}
-        onChange={handleChange}
-        placeholder="Username"
-        className="w-full border p-2 rounded"
-        required
-      />
-
-      <input
-        name="email"
-        value={form.email}
-        onChange={handleChange}
-        type="email"
-        placeholder="Email"
-        className="w-full border p-2 rounded"
-        required
-      />
-
-      <input
-        name="password"
-        value={form.password}
-        onChange={handleChange}
-        type="password"
-        placeholder="Password"
-        className="w-full border p-2 rounded"
-        required
-      />
-
-
-      <button
-        type="submit"
-        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 to-green-300 px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl space-y-6"
       >
-        Sign Up
-      </button>
+        <h2 className="text-3xl font-extrabold text-center text-green-700">
+          Create Your Account
+        </h2>
 
-      <span>
-        Have an account?{" "}
-        <Link to="/login" className="text-blue-500 no-underline hover:underline">
-          Log In
-        </Link>
-      </span>
+        <input
+          name="username"
+          value={form.username}
+          onChange={handleChange}
+          type="text"
+          placeholder="Username"
+          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+          required
+        />
 
-      {message && <p className="text-center text-sm text-gray-700 mt-2">{message}</p>}
-    </form>
+        <input
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          type="email"
+          placeholder="Email Address"
+          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+          required
+        />
+
+        <input
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          type="password"
+          placeholder="Password"
+          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+          required
+        />
+
+        <input
+          name="confirmPassword"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          type="password"
+          placeholder="Confirm Password"
+          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+          required
+        />
+
+        <button
+          type="submit"
+          className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
+        >
+          Sign Up
+        </button>
+
+        <p className="text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="text-green-600 font-semibold hover:underline"
+          >
+            Login
+          </Link>
+        </p>
+
+        {message && (
+          <p className="mt-2 text-center text-red-600 font-medium">{message}</p>
+        )}
+      </form>
+    </div>
   );
 }
