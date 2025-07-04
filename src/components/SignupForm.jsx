@@ -33,88 +33,84 @@ export default function SignupForm({ onSignup }) {
       const data = await res.json();
       if (data.status === "success") {
         onSignup(data.user);
-        setMessage(`Welcome ${data.user.username}!`);
         navigate("/");
       } else {
         setMessage(data.message || "Signup failed.");
       }
     } catch (error) {
-      console.error("Error during fetch:", error);
-      setMessage(
-        "An error occurred while connecting to the server. Please try again."
-      );
+      console.error("Signup error:", error);
+      setMessage("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 to-green-300 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-gray-900 px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white rounded-3xl p-8 shadow-xl space-y-6"
+        className="w-full max-w-md bg-gray-800 rounded-3xl p-10 shadow-2xl space-y-6 border border-yellow-500"
       >
-        <h2 className="text-3xl font-extrabold text-center text-green-700">
+        <h2 className="text-3xl font-bold text-center text-yellow-400">
           Create Your Account
         </h2>
 
-        <input
-          name="username"
-          value={form.username}
-          onChange={handleChange}
-          type="text"
-          placeholder="Username"
-          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-          required
-        />
+        <div className="space-y-4">
+          <input
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            type="text"
+            placeholder="Username"
+            className="w-full px-4 py-3 bg-gray-900 text-yellow-300 border border-yellow-600 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:outline-none transition"
+            required
+          />
 
-        <input
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          type="email"
-          placeholder="Email Address"
-          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-          required
-        />
+          <input
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            type="email"
+            placeholder="Email Address"
+            className="w-full px-4 py-3 bg-gray-900 text-yellow-300 border border-yellow-600 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:outline-none transition"
+            required
+          />
 
-        <input
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          type="password"
-          placeholder="Password"
-          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-          required
-        />
+          <input
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 bg-gray-900 text-yellow-300 border border-yellow-600 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:outline-none transition"
+            required
+          />
 
-        <input
-          name="confirmPassword"
-          value={form.confirmPassword}
-          onChange={handleChange}
-          type="password"
-          placeholder="Confirm Password"
-          className="w-full px-4 py-3 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
-          required
-        />
+          <input
+            name="confirmPassword"
+            value={form.confirmPassword}
+            onChange={handleChange}
+            type="password"
+            placeholder="Confirm Password"
+            className="w-full px-4 py-3 bg-gray-900 text-yellow-300 border border-yellow-600 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:outline-none transition"
+            required
+          />
+        </div>
 
         <button
           type="submit"
-          className="w-full py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition"
+          className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-xl shadow-md transition"
         >
           Sign Up
         </button>
 
-        <p className="text-center text-sm text-gray-600">
+        <p className="text-center text-sm text-gray-300">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-green-600 font-semibold hover:underline"
-          >
+          <Link to="/login" className="text-yellow-400 hover:underline font-medium">
             Login
           </Link>
         </p>
 
         {message && (
-          <p className="mt-2 text-center text-red-600 font-medium">{message}</p>
+          <p className="mt-2 text-center text-red-500 font-medium">{message}</p>
         )}
       </form>
     </div>
