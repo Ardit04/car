@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaCarAlt, FaSun, FaMoon } from 'react-icons/fa';
+import { FaCarAlt } from 'react-icons/fa'; // hequr FaSun, FaMoon
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ user, onLogout, vertical }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,10 +14,6 @@ const Navbar = ({ user, onLogout, vertical }) => {
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
-  const toggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
-    setDarkMode(!darkMode);
-  };
 
   // ---------------- VERTICAL ADMIN SIDEBAR ---------------- //
   if (vertical) {
@@ -75,19 +70,17 @@ const Navbar = ({ user, onLogout, vertical }) => {
 
   // ---------------- HORIZONTAL NAVBAR ---------------- //
   return (
-    <nav className="bg-black bg-opacity-90 text-yellow-400 py-4 px-6 relative z-50 shadow-md">
-              <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
-          <div className="flex items-center space-x-2">
-            <Link to="/" className="flex items-center space-x-2 text-yellow-300 hover:text-yellow-400">
-              <FaCarAlt className="w-6 h-6" />
-              <span className="text-2xl font-bold tracking-wide">CarZone</span>
-            </Link>
-          </div>
+    <nav className="bg-black bg-opacity-90 text-yellow-400 p-4 relative z-50">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2 text-yellow-300 hover:text-yellow-400">
+            <FaCarAlt className="w-6 h-6" />
+            <span className="text-2xl font-bold tracking-wide">CarZone</span>
+          </Link>
+        </div>
 
         <div className="flex items-center md:hidden">
-          <button onClick={toggleTheme} className="text-yellow-400 hover:text-yellow-200 mr-4">
-            {darkMode ? <FaSun /> : <FaMoon />}
-          </button>
+          {/* Hequr butoni për toggleTheme */}
           <button
             className="text-yellow-400 focus:outline-none"
             onClick={toggleMenu}

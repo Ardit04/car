@@ -121,7 +121,7 @@ const CarList = ({ user }) => {
 
       {/* Filters: sticky on top on scroll */}
       {(!user || user?.role === 1) && (
-        <div className="sticky top-20 bg-white z-20 p-6 rounded-xl shadow-md mb-12 flex flex-wrap gap-5 justify-center">
+        <div className=" bg-white z-20 p-6 rounded-xl shadow-md mb-12 flex flex-wrap gap-5 justify-center">
           {[{
             label: 'Brand',
             value: filterBrand,
